@@ -610,6 +610,9 @@ def put_file(url: str, path: Path, retries: int = 3) -> None:
     payload = path.read_bytes()
     for attempt in range(retries + 1):
         request = urllib.request.Request(url, data=payload, method="PUT")
+        # OSS presigned PUT signatures do not include Content-Type; prevent urllib
+        # from injecting application/x-www-form-urlencoded for byte payloads.
+        request.add_header("Content-Type", "")
         try:
             with urllib.request.urlopen(request, timeout=180) as response:
                 if 200 <= response.status < 300:

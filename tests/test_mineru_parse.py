@@ -163,6 +163,37 @@ defaults:
     assert "dry-run 完成" in result.stdout
 
 
+def test_put_file_sends_empty_content_type(tmp: Path) -> None:
+    upload = tmp / "upload.bin"
+    upload.write_bytes(b"payload")
+    seen = {}
+
+    class FakeResponse:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+    original_urlopen = mineru_parse.urllib.request.urlopen
+
+    def fake_urlopen(request, timeout):
+        seen["method"] = request.get_method()
+        seen["content_type"] = request.get_header("Content-type")
+        seen["timeout"] = timeout
+        return FakeResponse()
+
+    mineru_parse.urllib.request.urlopen = fake_urlopen
+    try:
+        mineru_parse.put_file("https://example.com/upload", upload)
+    finally:
+        mineru_parse.urllib.request.urlopen = original_urlopen
+
+    assert seen == {"method": "PUT", "content_type": "", "timeout": 180}
+
+
 def main() -> int:
     tests = [
         test_split_201_pages,
@@ -170,6 +201,7 @@ def main() -> int:
         test_expiry_warnings,
         test_merge_json_and_markdown,
         test_cli_dry_run,
+        test_put_file_sends_empty_content_type,
     ]
     with tempfile.TemporaryDirectory() as d:
         base = Path(d)
