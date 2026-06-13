@@ -1,0 +1,4 @@
+interface:
+  display_name: "PDF-parse"
+  short_description: "MinerU VLM 中文精准批量 PDF 解析"
+  default_prompt: "使用 $pdf-parse 解析这些 PDF，默认用 MinerU VLM 高精度模式，并自动处理拆分、并发、多账号额度轮换和中文结果引导。"

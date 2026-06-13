@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+mineru_accounts.yaml
+mineru_state.json
+mineru-output/
+outputs/
+work/
+_work/
+parts/
+merged/
